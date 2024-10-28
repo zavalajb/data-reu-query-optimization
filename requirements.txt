@@ -1,0 +1,12 @@
+langchain
+langchain_community
+langchain-openai 
+scikit-learn 
+langchain-ollama
+langchain_huggingface
+flask
+pyspark
+flask-restful
+flask-cors
+werkzeug==2.1.2
+gunicorn
