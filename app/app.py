@@ -12,17 +12,20 @@ from flask_cors import CORS, cross_origin
 
 #Logging
 import logging
+import json
 
 # Define the RAG application class
 class OptmApplication:
     def __init__(self, optimize_chain):
         self.optimize_chain = optimize_chain
-    def run(self, question):
+    def run(self, query):
         # Retrieve relevant documents
         # Extract content from retrieved documents
         # Get the answer from the language model
-        answer = self.optimize_chain.invoke({"question": question})
-        return answer
+        answer = self.optimize_chain.invoke({"query": query})
+        cleaned_answer = answer.replace("```sql", "").replace("```", "").replace("\n", " ").replace("\\n", " ").strip()
+        cleaned_answer = ' '.join(cleaned_answer.split())
+        return cleaned_answer
     
 def init():
     global prompt 
@@ -30,12 +33,13 @@ def init():
     global optimize_chain
     global optm_application 
     prompt = PromptTemplate(
-        template="""Based on your data bases kwnoledge answer the question:
-        Question: {question}
-
-        Answer:
+        template="""Given the following SQL query, provide an optimized SQL query only, without any additional text:
+        
+        Original Query: {query}
+        
+        Optimized Query (SQL only, no additional text or formatting):
         """,
-        input_variables=["question"],# "documents"],
+        input_variables=["query"],# "documents"],
     )
 
 
@@ -44,7 +48,7 @@ def init():
         model="llama3.1",
         temperature=0,
     )
-
+    logger.info("llama3.1 model loaded successfully")
 
     # Create a chain combining the prompt template and LLM
     optimize_chain = prompt | llm | StrOutputParser()
@@ -83,10 +87,10 @@ def optimization():
     if text is None:
         return jsonify({"error": "Missing 'text' parameter"}), 400
     
-    question = f"Optimize this query: {text}"
+    query = text
     try:
         logger.info("Optimizing query")
-        answer = optm_application.run(question)
+        answer = optm_application.run(query)
         logger.info("Query optimized")
         return jsonify({"result": answer})
     except Exception as e:
