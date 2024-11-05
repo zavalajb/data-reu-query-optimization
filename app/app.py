@@ -33,14 +33,49 @@ def init():
     global optimize_chain
     global optm_application 
     prompt = PromptTemplate(
-        template="""Given the following SQL query, provide an optimized SQL query only, without any additional text:
-        
-        Original Query: {query}
-        
-        Optimized Query (SQL only, no additional text or formatting):
-        """,
-        input_variables=["query"],# "documents"],
-    )
+    template="""Dado el siguiente conjunto de consultas SQL, optimízalas únicamente si se puede mejorar en rendimiento sin cambiar su funcionalidad ni lógica de negocio. 
+
+    Instrucciones detalladas:
+    1. **Mantén todas las consultas y estructuras originales**: No elimines ni modifiques ninguna tabla, columna o consulta del conjunto original, y asegúrate de que todas las consultas se retornen en el output, incluyendo *todas* las consultas `SELECT` en el orden en que aparecen en el input.
+    
+    2. **Preserva la funcionalidad completa de cada consulta**: No alteres los cálculos, condiciones o lógicas, especialmente en el caso de métricas o KPI. La optimización solo debe enfocarse en mejorar la eficiencia sin afectar el resultado lógico.
+
+    3. **Optimiza las uniones**: Identifica y mejora las `JOIN` cuando sea posible, especialmente cuando se trate de `LEFT JOIN` que pueden reducirse a `INNER JOIN` en caso de condiciones de filtro que lo permitan. Evalúa también si se pueden mover condiciones del `WHERE` a las uniones si esto mejora el rendimiento.
+
+    4. **Evita divisiones por cero**: En cualquier cálculo que involucre divisiones, verifica que el divisor no sea cero. Si hay un riesgo de división por cero, utiliza un `CASE WHEN` o `NULLIF` para manejarlo. Por ejemplo, en divisiones como `COUNT(x) / SUM(y)`, reescribe el cálculo como:
+    
+        ```sql
+        COUNT(x) / NULLIF(SUM(y), 0)
+        ```
+
+       Esto evitará errores de ejecución cuando el divisor pueda ser cero. Aplica esta lógica en todas las divisiones dentro del conjunto de consultas.
+
+    5. **Uso de COALESCE para valores nulos**: Usa `COALESCE` para asegurar que los valores nulos en agregados no generen resultados inesperados. Por ejemplo, reemplaza valores nulos en sumas y contadores si es necesario:
+
+        ```sql
+        COALESCE(SUM(column_name), 0)
+        ```
+
+    6. **No omitas consultas adicionales**: Si en el input se incluyen consultas adicionales (como `SELECT * FROM ...` para inspeccionar tablas), asegúrate de que todas aparezcan en el output sin cambios. La respuesta final debe incluir *todas* las consultas del input en el orden original.
+
+    7. **Retorno de la respuesta**: Solo proporciona el código SQL optimizado sin ningún texto adicional ni explicaciones. Si el conjunto de consultas no requiere optimización, responde con: "El Query proporcionado es óptimo".
+
+    Ejemplo de optimización:
+    - Si el query original es `SELECT COUNT(a) / SUM(b) FROM table1 WHERE b IS NOT NULL`, asegúrate de reescribirlo para evitar divisiones por cero como `SELECT COUNT(a) / NULLIF(SUM(b), 0) FROM table1 WHERE b IS NOT NULL`.
+
+    Query original: {query}
+
+    Respuesta (SQL únicamente, sin texto adicional ni formatos):
+    """,
+    input_variables=["query"],
+)
+
+
+
+
+
+
+
 
 
     # Initialize the LLM with Llama 3.1 model
@@ -84,6 +119,7 @@ def home():
 @app.route('/optimization', methods=['POST'])
 def optimization():
     text = request.form.get('text')
+    print(text)
     if text is None:
         return jsonify({"error": "Missing 'text' parameter"}), 400
     
