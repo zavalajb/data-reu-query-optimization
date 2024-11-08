@@ -37,6 +37,8 @@ For example, a financial services company analyzing vast amounts of transactiona
 
 * Requirements
     - Python 3.10
+    - Ollama llama3.1
+    - Visual Studio Code
       
 * How to start
   1. Clone the repository from GitHub: 
