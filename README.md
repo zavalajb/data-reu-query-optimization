@@ -23,6 +23,9 @@ For example, a financial services company analyzing vast amounts of transactiona
 
 ## Reference Architecture
 
+![sql_query_optimizer_v2 drawio](https://github.com/user-attachments/assets/139ff7fb-f596-4d12-b05b-501dadb1b090)
+
+
 ## Structure of repository
 
 - ### App ([App](app/)) :
