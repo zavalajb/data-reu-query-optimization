@@ -28,12 +28,21 @@ For example, a financial services company analyzing vast amounts of transactiona
 
 ## Structure of repository
 
-- ### App ([App](app/)) :
-  Folder with the app's python file.
-- ### Queries ([Queryes to test](queries/)) :
-  Files with list of queries to test the model.
-- ### Requirements ([Requirements](requirements)) :
-  Text file with the libraries needed to run the model.
+- ### App:
+  - Templates:
+    - Index: HTML file containing the front of our project. 
+  - Static:
+    - Main: This script makes it easy for the user to write a SQL query, send a request to the server for optimization, and view the results in the web interface.
+  - App: Python file containing the configuration to launch the API
+  - .flaskenv: Flask file containing the configuration required to launch the API.
+  - Requirements: Text file with the libraries needed to run the model.
+- ### Queries :
+Contains two SQL source files with a series of queries that the user can use to understand how the API works, and check that it is working correctly.
+
+##
+
+![ezgif com-animated-gif-maker](https://github.com/user-attachments/assets/1409d434-c0af-446f-905b-96ac45cbecf1)
+
 
 
 ## Usage
@@ -81,6 +90,10 @@ For example, a financial services company analyzing vast amounts of transactiona
     ```bash
     python app.py
     ```
+    ```bash
+    flask run
+    ```
+    
     - When we run our script, it will connect to port 5000 of our local host, and the URL that we have to open in order to start using our SQL code optimizer will appear in the terminal.        <br><br>
     The URL that we must open is the following:
     ```bash
