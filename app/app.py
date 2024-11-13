@@ -81,6 +81,8 @@ def init():
     # Initialize the LLM with Llama 3.1 model
     llm = ChatOllama(
         model="llama3.1",
+        base_url= "http://ollama-container:11434", 
+        verbose=True,
         temperature=0,
     )
     logger.info("llama3.1 model loaded successfully")
