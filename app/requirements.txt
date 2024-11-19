@@ -2,10 +2,11 @@ langchain
 langchain_community
 langchain-openai 
 scikit-learn 
-langchain-ollama
+langchain_ollama
 langchain_huggingface
 flask
-flask-restful
-flask-cors
+flask_restful
+flask_cors
 werkzeug==2.1.2
 gunicorn
+requests

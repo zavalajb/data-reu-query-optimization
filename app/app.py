@@ -70,18 +70,10 @@ def init():
     input_variables=["query"],
 )
 
-
-
-
-
-
-
-
-
     # Initialize the LLM with Llama 3.1 model
     llm = ChatOllama(
         model="llama3.1",
-        base_url= "http://ollama-container:11434", 
+        base_url= "http://host.docker.internal:11434", 
         verbose=True,
         temperature=0,
     )
@@ -121,18 +113,20 @@ def home():
 @app.route('/optimization', methods=['POST'])
 def optimization():
     text = request.form.get('text')
-    print(text)
+    logger.info(f"Received query: {text}")  # Agregado para depurar
     if text is None:
         return jsonify({"error": "Missing 'text' parameter"}), 400
     
     query = text
     try:
         logger.info("Optimizing query")
+        # Llamada a la función para optimizar el query
         answer = optm_application.run(query)
         logger.info("Query optimized")
         return jsonify({"result": answer})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Error occurred: {e}")
+        return jsonify({"error": f"An error occurred while optimizing the query: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

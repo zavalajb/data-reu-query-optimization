@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   api:
     build:
@@ -7,17 +9,5 @@ services:
       - "5000:5000"
     environment:
       - FLASK_APP=app/app.py
-      - OLLAMA_MODEL_PATH=/root/.ollama
-    depends_on:
-      - ollama
-
-  ollama:
-    image: ollama/ollama
-    command: -d -v ollama:/root/.ollama -p 11434:11434 --name ollama
-    volumes:
-      - ollama:/root/.ollama
-    expose:
-      - "11434"
-
-volumes:
-  ollama:
+      - OLLAMA_HOST=http://host.docker.internal:11434  # Conecta al modelo en tu máquina local
+    command: flask run --host=0.0.0.0
