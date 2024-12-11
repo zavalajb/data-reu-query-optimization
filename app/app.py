@@ -73,7 +73,7 @@ def init():
     # Initialize the LLM with Llama 3.1 model
     llm = ChatOllama(
         model="llama3.1",
-        base_url= "http://host.docker.internal:11434", 
+        base_url = os.getenv("OLLAMA_HOST", "http://ollama:11434"), 
         verbose=True,
         temperature=0,
     )

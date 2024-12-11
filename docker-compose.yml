@@ -1,13 +1,26 @@
-version: "3.8"
-
 services:
+  
   api:
     build:
       context: ./app
       dockerfile: Dockerfile
+    container_name: api
     ports:
-      - "5000:5000"
+      - "5000:5000" # Puerto expuesto para la API Flask
+    depends_on:
+      - ollama
     environment:
-      - FLASK_APP=app/app.py
-      - OLLAMA_HOST=http://host.docker.internal:11434  # Conecta al modelo en tu máquina local
-    command: flask run --host=0.0.0.0
+      - OLLAMA_API_URL=http://ollama:11434
+    restart: always
+
+  ollama: # Asegúrate de que está al mismo nivel que `api`
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434" # Puerto expuesto para Ollama
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: always
+
+volumes:
+  ollama_models: # Volumen compartido entre sesiones de Docker
