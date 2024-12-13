@@ -11,16 +11,39 @@ services:
       - ollama
     environment:
       - OLLAMA_API_URL=http://ollama:11434
+    networks:
+      - ollama-network
+
+    
     restart: always
 
-  ollama: # Asegúrate de que está al mismo nivel que `api`
-    image: ollama/ollama
+  ollama:
+    build:
+      context: ./
+      dockerfile: Dockerfile
     container_name: ollama
+    pull_policy: always
     ports:
-      - "11434:11434" # Puerto expuesto para Ollama
+      - "11434:11434"
     volumes:
-      - ollama_models:/root/.ollama
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    #deploy:
+    #  resources:
+    #    reservations:
+    #      cpus: '4'
+    #      memory: 8G
+    command: serve
+    networks:
+      - ollama-network
+
     restart: always
+
+networks:
+  ollama-network:
+    driver: bridge
+
 
 volumes:
-  ollama_models: # Volumen compartido entre sesiones de Docker
+  ollama_data: # Volumen compartido entre sesiones de Docker

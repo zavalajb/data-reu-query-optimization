@@ -22,10 +22,14 @@ class OptmApplication:
         # Retrieve relevant documents
         # Extract content from retrieved documents
         # Get the answer from the language model
-        answer = self.optimize_chain.invoke({"query": query})
-        cleaned_answer = answer.replace("```sql", "").replace("```", "").replace("\n", " ").replace("\\n", " ").strip()
-        cleaned_answer = ' '.join(cleaned_answer.split())
-        return cleaned_answer
+        try:
+            answer = self.optimize_chain.invoke({"query": query})
+            cleaned_answer = answer.replace("```sql", "").replace("```", "").replace("\n", " ").replace("\\n", " ").strip()
+            cleaned_answer = ' '.join(cleaned_answer.split())
+            return cleaned_answer
+        except Exception as e:
+            logging.error(f"Error in optimize_chain: {str(e)}")
+            raise
     
 def init():
     global prompt 
@@ -65,18 +69,19 @@ def init():
 
     Query original: {query}
 
-    Respuesta (SQL únicamente, sin texto adicional ni formatos):
+    La respuesta debe ser sólo la query optimizada: SQL únicamente, sin texto adicional ni formatos:
     """,
     input_variables=["query"],
 )
 
     # Initialize the LLM with Llama 3.1 model
     llm = ChatOllama(
-        model="llama3.1",
-        base_url = os.getenv("OLLAMA_HOST", "http://ollama:11434"), 
+        model="llama3.1:latest",
+        base_url = "http://ollama:11434",#os.getenv("OLLAMA_HOST", "http://ollama:11434"), 
         verbose=True,
         temperature=0,
-    )
+        #format="json", 
+        request_timeout=120.0)  
     logger.info("llama3.1 model loaded successfully")
 
     # Create a chain combining the prompt template and LLM
